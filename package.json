@@ -1,0 +1,19 @@
+{
+  "name": "dndtools",
+  "version": "0.0.1",
+  "description": "Tools for processing the 5th Edtion SRD",
+  "main": "server.js",
+  "dependencies": {
+    "bulk-require": "^1.0.0",
+    "lodash": "^4.17.2",
+    "markdown-pdf": "^7.0.0",
+    "vorpal": "^1.11.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "run": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Birk Alvarez",
+  "license": "MIT"
+}
