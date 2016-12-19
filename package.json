@@ -5,8 +5,11 @@
   "main": "server.js",
   "dependencies": {
     "bulk-require": "^1.0.0",
+    "easy-table": "^1.0.0",
     "lodash": "^4.17.2",
-    "markdown-pdf": "^7.0.0",
+    "markdown-pdf": "git+https://github.com/BirkAlvarez/markdown-pdf.git",
+    "marked": "^0.3.6",
+    "marked-terminal": "^2.0.0",
     "vorpal": "^1.11.4"
   },
   "devDependencies": {},

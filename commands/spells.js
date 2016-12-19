@@ -4,17 +4,14 @@ const _ = require('lodash');
 const fs = require('fs');
 const mdPdf = require('markdown-pdf');
 
-const config = require('../config');
-const ROOT = config.ROOT;
-const SPELLS_DIR = config.SPELLS_DIR;
-const SPELL_LISTS_DIR = config.SPELL_LISTS_DIR;
-const PAGEBREAK = config.PAGEBREAK;
-const mdOptions = config.mdOptions;
+const {SPELLS_DIR, SPELL_LISTS_DIR, PAGEBREAK, mdOptions} = require('../config');
+const {nameify} = require('../lib/utils');
 
 module.exports = {
-  name: 'spells',
+  cmd: 'spells',
   description: 'Generates PDFs of all spells by class and level',
   action: function(args, fn) {
+    console.log('Generating Spells');
     createPDFs();
     fn();
   }
@@ -80,16 +77,14 @@ function createPDFs() {
 
     const outStr = outputArr.join('\n\n');
     masterPDF.push(outStr);
-    mdPdf(mdOptions).from.string(outStr).to(`./pdfs/${className}`);
+    mdPdf(mdOptions).from.string(outStr).to(`./pdfs/${className}`, function() {
+      // TODO
+    });
   });
 
-  mdPdf(mdOptions).from.string(masterPDF.join(`\n\n${PAGEBREAK}\n\n`)).to(`./pdfs/All`);
+  mdPdf(mdOptions).from.string(masterPDF.join(`\n\n${PAGEBREAK}\n\n`)).to(`./pdfs/All`, function() {
+    // TODO
+  });
 }
 
 
-function nameify(name) {
-  return name.split('.')[0]
-             .split('_')
-             .map(x => _.capitalize(x))
-             .join(' ');
-}
