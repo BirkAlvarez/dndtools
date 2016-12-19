@@ -11,6 +11,19 @@ const {monstersByName, monstersByCr, monstersByEnvAndCr} = require('../lib/monst
 const {PAGEBREAK, mdOptions} = require('../config');
 const environments = _.keys(monstersByEnvAndCr);
 const possibleDifficulties = ['easy', 'medium', 'hard', 'deadly'];
+const difficultyWeights = {
+  easy:   30,
+  medium: 40,
+  hard:   25,
+  deadly: 5,
+};
+const difficultyCounts = [];
+
+_.forEach(difficultyWeights, (weight, difficulty) => {
+  for (let i = 0; i < weight; i++) {
+    difficultyCounts.push(difficulty);
+  }
+});
 
 const challengMultiplier = [
   // 1 Monster
@@ -29,29 +42,25 @@ const challengMultiplier = [
 
 const monsterCountWeights = [
   // 1
-  15,
+  250,
   // 2
-  19,
+  200,
   // 3-6 Monsters (45%)
-  15, 15, 10, 5,
+  150, 100, 50, 50,
   // 7-10 Monsters (10%)
-  3, 3, 2, 2,
+  10, 10, 5, 5,
   // 11-14 Monsters (5%)
-  2, 1, 1, 1,
+  5, 3, 2, 1,
   // 15+ Monsters (5%)
   1, 1, 1, 1, 1, 1
 ];
 const monsterCounts = []
 
-for (let i = 0, sum = 0; i < monsterCountWeights.length; i++) {
+for (let i = 0; i < monsterCountWeights.length; i++) {
   let weight = monsterCountWeights[i];
-  sum += weight;
   for (let j = 0; j < weight; j++) {
     monsterCounts.push(i + 1);
   }
-}
-if (monsterCounts.length !== 100) {
-  throw `invalid count weights ${monsterCounts.length}`;
 }
 
 const crXP = {
@@ -150,6 +159,10 @@ module.exports = {
       autocomplete: environments,
     },
     {
+      flag: '-o, --only',
+      description: 'Only print the encounter',
+    },
+    {
       flag: '-m, --matrix',
       description: 'Create an encounter matrix by level and difficulty',
     },
@@ -170,7 +183,7 @@ function createEncounter(args, fn) {
 
   const encounters = {};
   const timestamp = Date.now();
-  const options = _.pick(args.options, ['environment', 'playerCount']);
+  const options = _.pick(args.options, ['environment', 'playerCount', 'only']);
   let {num, matrix, difficulty, level} = args.options;
   let difficultyArr;
   let levelArr;
@@ -189,7 +202,7 @@ function createEncounter(args, fn) {
   } else if (matrix) {
     difficultyArr = possibleDifficulties;
   } else {
-    difficultyArr = [possibleDifficulties[_.random(possibleDifficulties.length - 1)]]
+    difficultyArr = [difficultyCounts[_.random(difficultyCounts.length - 1)]]
   }
 
   if (level) {
@@ -225,8 +238,8 @@ function createEncounter(args, fn) {
 
 
 function generateEncounter(options) {
-  const {playerCount, difficulty, level, environment, save} = options;
-  const monsterCount = monsterCounts[_.random(0, 99)];
+  const {playerCount, difficulty, level, environment, save, only} = options;
+  const monsterCount = monsterCounts[_.random(0, monsterCounts.length - 1)];
   const totalXp = (xpByLevel[level][difficulty] * playerCount) / challengMultiplier[monsterCount];
   const environmentMonsters = monstersByEnvAndCr[environment];
   const encounter = {};
@@ -267,15 +280,17 @@ function generateEncounter(options) {
         difficulty,
         monsterCount,
         totalXp,
-        monsterXp,
+        // monsterXp,
         monsterCr,
         monsters: encounterSummary,
       }
     ]));
 
-    _.forEach(encounter, (num, id) => {
-      console.log(marked(monstersByName[id].description));
-    });
+    if (!only) {
+      _.forEach(encounter, (num, id) => {
+        console.log(marked(monstersByName[id].description));
+      });
+    }
   }
 
   return `# ${encounterSummary} \n\n<hr>\n\n` +
