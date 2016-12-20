@@ -1,5 +1,26 @@
 body {
-  font-size: 0.4em;
+  font-size: 0.4rem;
+}
+
+* {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+h1 {
+  font-size: 1.4em !important;
+  margin: 5px 0 0 !important;
+}
+
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: 1.1em !important;
+  font-weight: bold !important;
+  border-bottom: 1px dotted #666;
+  width: 50%;
 }
 
 table {

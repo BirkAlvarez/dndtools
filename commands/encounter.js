@@ -192,7 +192,7 @@ function createEncounter(args, fn) {
   //let {num, matrix, difficulty, level} = args.options;
   let {num, baseLevel, environment} = args.options;
   let difficultyArr = difficultyCounts;
-  let levelArr = [baseLevel, baseLevel + 1];
+  let levelArr = [baseLevel];//, baseLevel + 1];
   let playerCounts = [3, 4, 5, 6];
 
   environment = environment || 'all';
@@ -273,7 +273,7 @@ function createEncounter(args, fn) {
 
     monsterSheet = _.keys(encounterMonsters).sort().map((id) => {
       const monster = monstersByName[id];
-      return monster.description;
+      return monster.description + ' <br> ';
       //return monster.name;
     });
 
@@ -321,10 +321,53 @@ function createEncounter(args, fn) {
   outputArr.push(monsterSheet.join('<hr>'));
 
 
-  const outStr = outputArr.join('\n\n');
+  const outStr = `
+  <style>
+body {
+  font-size: 0.4rem;
+}
 
-  mdPdf(mdOptions).from.string(outStr).to(`./pdfs/encounters/${environment}/${baseLevel}_${timestamp}`, function() {
-  });
+* {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+h1 {
+  font-size: 1.4em !important;
+  margin: 5px 0 0 !important;
+}
+
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: 1.1em !important;
+  font-weight: bold !important;
+  border-bottom: 1px dotted #666;
+  width: 50%;
+}
+
+table {
+  font-family:Arial, Helvetica, sans-serif;
+  color:#333;
+  border:1px solid #e0e0e0;
+  margin-bottom: 10px;
+}
+
+table td {
+  padding: 0 5px;
+  border-bottom:1px solid #e0e0e0;
+  border-left: 1px solid #e0e0e0;
+}
+  </style>
+
+  ` + outputArr.join('\n\n');
+
+  const filename = `./pdfs/encounters/${environment}/${baseLevel}_${timestamp}.html`;
+  fs.writeFileSync(filename, outStr);
+
+  //mdPdf(mdOptions).from.string(outStr).to();
 
   // const outStr = outputArr.join(`\n\n${PAGEBREAK}\n\n`);
   // mdPdf(mdOptions).from.string(outStr).to(`./pdfs/encounters/${options.environment}/${encounterLevel}/${encounterDifficulty}/${timestamp}`, function() {
