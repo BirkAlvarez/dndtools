@@ -273,7 +273,21 @@ function createEncounter(args, fn) {
 
     monsterSheet = _.keys(encounterMonsters).sort().map((id) => {
       const monster = monstersByName[id];
-      return monster.description + ' <br> ';
+      const {actions, features, legendary} = monster.attrs;
+      const attributes = _.omit(monster.attrs, ['name', 'features', 'actions', 'legendary']);
+      const attrStr = formatObj(attributes);
+      const actionStr = formatObj(actions, 'Actions');
+      const legendaryStr = formatObj(legendary, 'Legendary Actions');
+
+      return `
+        <div class="monster">
+          <h1>${monster.name}</h1>
+          ${attrStr}
+          ${actionStr}
+          ${legendaryStr}
+        </div>
+      `;
+      //return monster.description + ' <br> ';
       //return monster.name;
     });
 
@@ -318,13 +332,13 @@ function createEncounter(args, fn) {
 
   outputArr.push(`\n\n${PAGEBREAK}\n\n`);
 
-  outputArr.push(monsterSheet.join('<hr>'));
+  outputArr.push(monsterSheet.join('<br>'));
 
 
   const outStr = `
   <style>
 body {
-  font-size: 0.4rem;
+  font-size: 12px;
 }
 
 * {
@@ -344,8 +358,8 @@ h5,
 h6 {
   font-size: 1.1em !important;
   font-weight: bold !important;
-  border-bottom: 1px dotted #666;
-  width: 50%;
+  margin: 5px 0 0 !important;
+  padding: 0 !important;
 }
 
 table {
@@ -359,6 +373,13 @@ table td {
   padding: 0 5px;
   border-bottom:1px solid #e0e0e0;
   border-left: 1px solid #e0e0e0;
+}
+
+.monster {
+  border-bottom: 1px solid #999;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  page-break-inside: avoid;
 }
   </style>
 
@@ -490,4 +511,31 @@ function generateEncounter(options, rerolls = 0) {
   //   const description = monstersByName[id].description;
   //   return description;
   // }).join('\n\n<hr>\n\n');
+}
+
+
+function formatObj(obj, title) {
+  if (!_.keys(obj).length) {
+    return '';
+  }
+
+  const strArr = [];
+
+  if (title) {
+    strArr.push(`<h2>${title}</h2>`);
+  }
+
+  _.keys(obj).sort().forEach((key) => {
+    if (key !== '_description') {
+      if (title) {
+        strArr.push(`<div>`);
+      }
+        strArr.push(`<strong>${key}</strong>: ${obj[key]} `);
+      if (title) {
+        strArr.push(`</div>`);
+      }
+    }
+  });
+
+  return strArr.join('');//<br>');
 }

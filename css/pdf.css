@@ -19,7 +19,8 @@ h5,
 h6 {
   font-size: 1.1em !important;
   font-weight: bold !important;
-  border-bottom: 1px dotted #666;
+  margin: 5px 0 0 !important;
+  padding: 0 !important;
   width: 50%;
 }
 
