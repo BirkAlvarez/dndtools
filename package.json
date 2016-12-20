@@ -6,6 +6,7 @@
   "dependencies": {
     "bulk-require": "^1.0.0",
     "easy-table": "^1.0.0",
+    "html-pdf": "^2.1.0",
     "lodash": "^4.17.2",
     "markdown-pdf": "git+https://github.com/BirkAlvarez/markdown-pdf.git",
     "marked": "^0.3.6",

@@ -338,17 +338,18 @@ function createEncounter(args, fn) {
   const outStr = `
   <style>
 body {
-  font-size: 12px;
+  font-size: 8px;
+  padding: 20px;
 }
 
 * {
-  margin: 0 !important;
-  padding: 0 !important;
+  margin: 0;
+  padding: 0;
 }
 
 h1 {
-  font-size: 1.4em !important;
-  margin: 5px 0 0 !important;
+  font-size: 12px;
+  margin: 5px 0 0;
 }
 
 h2,
@@ -356,10 +357,10 @@ h3,
 h4,
 h5,
 h6 {
-  font-size: 1.1em !important;
-  font-weight: bold !important;
-  margin: 5px 0 0 !important;
-  padding: 0 !important;
+  font-size: 10px;
+  font-weight: bold;
+  margin: 5px 0 0;
+  padding: 0;
 }
 
 table {
@@ -367,6 +368,7 @@ table {
   color:#333;
   border:1px solid #e0e0e0;
   margin-bottom: 10px;
+  font-size: 8px;
 }
 
 table td {
@@ -377,17 +379,24 @@ table td {
 
 .monster {
   border-bottom: 1px solid #999;
-  margin-bottom: 10px;
-  padding-bottom: 10px;
+  margin-top: 20px;
   page-break-inside: avoid;
 }
   </style>
 
   ` + outputArr.join('\n\n');
 
-  const filename = `./pdfs/encounters/${environment}/${baseLevel}_${timestamp}.html`;
+  //const filename = `./pdfs/encounters/${environment}/${baseLevel}_${timestamp}.html`;
+  const filename = `./pdfs/encounters/${environment}/${baseLevel}_${timestamp}.pdf`;
   fs.writeFileSync(filename, outStr);
 
+var pdf = require('html-pdf');
+var options = { format: 'Letter' };
+
+pdf.create(outStr, options).toFile(filename, function(err, res) {
+  if (err) return console.log(err);
+  console.log(res); // { filename: '/app/businesscard.pdf' }
+});
   //mdPdf(mdOptions).from.string(outStr).to();
 
   // const outStr = outputArr.join(`\n\n${PAGEBREAK}\n\n`);
