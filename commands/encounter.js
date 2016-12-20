@@ -7,15 +7,19 @@ const Table = require('easy-table');
 const marked = require('marked');
 const TerminalRenderer = require('marked-terminal');
 
-const {monstersByName, monstersByCr, monstersByEnvAndCr} = require('../lib/monsters');
+const {monstersByName, monstersByEnvAndCr} = require('../lib/monsters');
 const {PAGEBREAK, mdOptions} = require('../config');
 const environments = _.keys(monstersByEnvAndCr);
 const possibleDifficulties = ['easy', 'medium', 'hard', 'deadly'];
 const difficultyWeights = {
-  easy:   30,
-  medium: 40,
-  hard:   25,
-  deadly: 5,
+  easy:   5,
+  medium: 8,
+  hard:   5,
+  deadly: 2,
+  // easy:   30,
+  // medium: 40,
+  // hard:   25,
+  // deadly: 5,
 };
 const difficultyCounts = [];
 
@@ -138,42 +142,44 @@ module.exports = {
   options: [
     {
       flag: '-n, --num <num>',
-      description: 'Number of encounters to generate (default 1)',
+      //description: 'Number of encounters to generate (default 1)',
+      description: 'Number of encounter sheets to generate (default 1)',
     },
+    // {
+    //   flag: '-p, --players <playerCount>',
+    //   description: 'Number of players (default 4)',
+    // },
+    // {
+    //   flag: '-d, --difficulty <difficulty>',
+    //   description: 'Difficulty',
+    //   autocomplete: possibleDifficulties,
+    // },
     {
-      flag: '-p, --players <playerCount>',
-      description: 'Number of players (default 4)',
-    },
-    {
-      flag: '-d, --difficulty <difficulty>',
-      description: 'Difficulty',
-      autocomplete: possibleDifficulties,
-    },
-    {
-      flag: '-l, --level <level>',
+      flag: '-l, --baseLevel <baseLevel>',
       description: 'Average Player Level (default 1)',
+      autocomplete: [1,3,5,7,9,11,13,15,17,19]
     },
     {
       flag: '-e, --environment <environment>',
       description: 'Filter by environment (default all)',
       autocomplete: environments,
     },
-    {
-      flag: '-o, --only',
-      description: 'Only print the encounter',
-    },
-    {
-      flag: '-m, --matrix',
-      description: 'Create an encounter matrix by level and difficulty',
-    },
-    {
-      flag: '-s, --save',
-      description: 'Save To Encounter Folder? (using the matrix option or number > 1 makes saves by default)',
-    },
-    {
-      flag: '--save-options',
-      description: 'Save these options and use them as the defaults for the current session (does not generate encounter)',
-    },
+    // {
+    //   flag: '-o, --only',
+    //   description: 'Only print the encounter',
+    // },
+    // {
+    //   flag: '-m, --matrix',
+    //   description: 'Create an encounter matrix by level and difficulty',
+    // },
+    // {
+    //   flag: '-s, --save',
+    //   description: 'Save To Encounter Folder? (using the matrix option or number > 1 makes saves by default)',
+    // },
+    // {
+    //   flag: '--save-options',
+    //   description: 'Save these options and use them as the defaults for the current session (does not generate encounter)',
+    // },
   ],
   action: createEncounter
 };
@@ -181,79 +187,197 @@ module.exports = {
 function createEncounter(args, fn) {
   console.log('Generating Encounters');
 
-  const encounters = {};
   const timestamp = Date.now();
-  const options = _.pick(args.options, ['environment', 'playerCount', 'only']);
-  let {num, matrix, difficulty, level} = args.options;
-  let difficultyArr;
-  let levelArr;
+  //const options = _.pick(args.options, ['environment']);//, 'playerCount', 'only']);
+  //let {num, matrix, difficulty, level} = args.options;
+  let {num, baseLevel, environment} = args.options;
+  let difficultyArr = difficultyCounts;
+  let levelArr = [baseLevel, baseLevel + 1];
+  let playerCounts = [3, 4, 5, 6];
 
-  options.environment = options.environment || 'all';
-  options.playerCount = options.playerCount || 4;
+  environment = environment || 'all';
+  //options.environment = options.environment || 'all';
+  // options.playerCount = options.playerCount || 4;
 
   num = parseInt(num) || 1;
 
-  if (num > 1 || matrix) {
-    options.save = true;
-  }
+  // if (num > 1 || matrix) {
+  //   options.save = true;
+  // }
 
-  if (difficulty) {
-    difficultyArr = [difficulty];
-  } else if (matrix) {
-    difficultyArr = possibleDifficulties;
-  } else {
-    difficultyArr = [difficultyCounts[_.random(difficultyCounts.length - 1)]]
-  }
+  // if (difficulty) {
+  //   difficultyArr = [difficulty];
+  // } else if (matrix) {
+  //   difficultyArr = possibleDifficulties;
+  // } else {
+  //   difficultyArr = [difficultyCounts[_.random(difficultyCounts.length - 1)]]
+  // }
 
-  if (level) {
-    levelArr = [level];
-  } else if (matrix) {
-    levelArr = Array(20).fill().map((x, i) => i + 1);
-  } else {
-    levelArr = [1];
-  }
+  // if (level) {
+  //   levelArr = [level];
+  // } else if (matrix) {
+  //   levelArr = Array(20).fill().map((x, i) => i + 1);
+  // } else {
+  //   levelArr = [1];
+  // }
 
-  levelArr.forEach((encounterLevel) => {
-    difficultyArr.forEach((encounterDifficulty) => {
-      const outputArr = [];
+  const encounterSheets = [];
+  let monsterSheet;
 
-      for (let i = 0; i < num; i++) {
-        const encounterOptions = _.assign({
-          difficulty: encounterDifficulty,
-          level: encounterLevel,
-        }, options);
-        outputArr.push(generateEncounter(encounterOptions));
-      }
-
-      if (options.save) {
-        const outStr = outputArr.join(`\n\n${PAGEBREAK}\n\n`);
-        mdPdf(mdOptions).from.string(outStr).to(`./pdfs/encounters/${options.environment}/${encounterLevel}/${encounterDifficulty}/${timestamp}`, function() {
-        });
-      }
+  for (let i = 0; i < num; i++) {
+    const monsterSubList = getMonsterSubList({
+      environment,
     });
+    const encounterMonsters = {};
+
+    levelArr.forEach((level) => {
+      const levelTable = [];
+
+      difficultyArr.forEach((difficulty, index) => {
+        const difficultyTable = {
+          '1d20': index + 1
+        };
+
+        playerCounts.forEach((playerCount) => {
+          const encounterOptions = {
+            environment,
+            playerCount,
+            monsterSubList,
+            difficulty,
+            level,
+          };
+          const {encounter, monsterXp, totalXp, actualXp, quality, rerolls} = generateEncounter(encounterOptions);
+          const encounterSummary = _.keys(encounter).sort().map((id) => {
+            const monster = monstersByName[id];
+            //return ` ${monster.name}(${encounter[id]}/${crXP[monster.cr]})`;
+            return ` ${monster.name}(${encounter[id]})`;
+          });
+          _.forEach(encounter, (num, id) => {
+            encounterMonsters[id] = encounterMonsters[id] || true;
+          });
+
+          //difficultyTable[`${playerCount} PCs`] = `${encounterSummary}, ${totalXp}, ${Math.floor(quality * 100)}% (${rerolls})`;
+          if (actualXp) {
+            //difficultyTable[`${playerCount} PCs`] = `${actualXp}xp: ${encounterSummary}`;
+            difficultyTable[`${playerCount} PCs`] = `${encounterSummary}`;
+          } else {
+            difficultyTable[`${playerCount} PCs`] = '-';
+          }
+        });
+
+        levelTable.push(difficultyTable);
+      });
+
+      encounterSheets.push(levelTable);
+    });
+
+    monsterSheet = _.keys(encounterMonsters).sort().map((id) => {
+      const monster = monstersByName[id];
+      return monster.description;
+      //return monster.name;
+    });
+
+    // console.log('===========================');
+    // console.log(monsterSheet);
+    // console.log('*****', monsterSheet.length);
+    // console.log('===========================');
+  }
+
+  encounterSheets.forEach((sheet) => {
+    console.log(Table.print(sheet));
   });
+
+  const outputArr = [];
+
+  encounterSheets.forEach((sheet, index) => {
+    let columns;
+
+    outputArr.push(`Level ${baseLevel + index}`);
+
+    outputArr.push('<table><tbody>');
+
+    sheet.forEach((row, index) => {
+      if (index === 0) {
+        columns = _.keys(row).sort();
+        outputArr.push([
+          '<tr>',
+          columns.map(x => `<td>${x}</td>`),
+          '</tr>',
+        ].join(''));
+      };
+
+      outputArr.push([
+        '<tr>',
+        columns.map(x => `<td>${row[x]}</td>`),
+        '</tr>',
+      ].join(''));
+    });
+
+    outputArr.push('</tbody></table>');
+  });
+
+  outputArr.push(`\n\n${PAGEBREAK}\n\n`);
+
+  outputArr.push(monsterSheet.join('<hr>'));
+
+
+  const outStr = outputArr.join('\n\n');
+
+  mdPdf(mdOptions).from.string(outStr).to(`./pdfs/encounters/${environment}/${baseLevel}_${timestamp}`, function() {
+  });
+
+  // const outStr = outputArr.join(`\n\n${PAGEBREAK}\n\n`);
+  // mdPdf(mdOptions).from.string(outStr).to(`./pdfs/encounters/${options.environment}/${encounterLevel}/${encounterDifficulty}/${timestamp}`, function() {
+  // });
 
   fn();
 }
 
 
-function generateEncounter(options) {
-  const {playerCount, difficulty, level, environment, save, only} = options;
-  const monsterCount = monsterCounts[_.random(0, monsterCounts.length - 1)];
-  const totalXp = (xpByLevel[level][difficulty] * playerCount) / challengMultiplier[monsterCount];
-  const environmentMonsters = monstersByEnvAndCr[environment];
+function getMonsterSubList(options) {
+  const {environment} = options;
+  const monstersByEnv = monstersByEnvAndCr[environment];
+  const subLists = {};
+
+  _.forEach(monstersByEnv, (monsters, cr) => {
+    let selections = monsters.length > 3? 3: monsters.length;
+    subLists[cr] = _.shuffle(monsters).slice(0, _.random(1, selections));
+  });
+
+  return subLists;
+}
+
+
+
+
+function generateEncounter(options, rerolls = 0) {
+  const {monsterSubList, playerCount, difficulty, level, environment, save, only} = options;
+  const totalXp = xpByLevel[level][difficulty] * playerCount;
+  //const environmentMonsters = monstersByEnvAndCr[environment];
   const encounter = {};
 
-  let monsterXp = totalXp / monsterCount;
+  let monsterCount;
+  let multiplier;
+  let adjustedXp;
+
+  do {
+    monsterCount = monsterCounts[_.random(0, monsterCounts.length - 1)];
+    multiplier = challengMultiplier[monsterCount - 1];
+    adjustedXp = Math.floor(totalXp / multiplier);
+  } while (monsterCount * multiplier * 10 > totalXp);
+
+  let monsterXp = Math.floor(adjustedXp / monsterCount);
   let monsterCr = 0;
   let monsterList;
 
   for (let i = 0; i < monsterXp; i++) {
-    if (xpCR[i]) {
-      monsterCr = xpCR[i];
+    let cr = xpCR[i];
+    if (cr && monsterSubList[cr] && monsterSubList[cr].length) {
+      monsterCr = cr;
     }
   }
-  monsterList = environmentMonsters[monsterCr];
+  //monsterList = environmentMonsters[monsterCr];
+  monsterList = monsterSubList[monsterCr];
 
   if (monsterList) {
     for (let i = 0; i < monsterCount; i++) {
@@ -267,35 +391,60 @@ function generateEncounter(options) {
     //encounter.none = 0;
   }
 
-  const encounterSummary = _.map(encounter, (num, id) => {
+  //const actualXp = monsterCount * crXP[monsterCr] * multiplier;
+  const actualXp = _.sum(_.map(encounter, (num, id) => {
     const monster = monstersByName[id];
-    return ` ${monster.name}(${num})`;
-  });
+    return crXP[monster.cr] * num;
+  })) * multiplier;
 
-
-  if (!save) {
-    console.log(Table.print([
-      {
-        level,
-        difficulty,
-        monsterCount,
-        totalXp,
-        // monsterXp,
-        monsterCr,
-        monsters: encounterSummary,
-      }
-    ]));
-
-    if (!only) {
-      _.forEach(encounter, (num, id) => {
-        console.log(marked(monstersByName[id].description));
-      });
-    }
+  // re-roll for low-quality encounters
+  const quality = actualXp / totalXp;
+  if (quality < .76 && rerolls < 50) {
+    return generateEncounter(options, rerolls + 1);
+  // } else if (rerolls === 50) {
+  //   console.log('max rerolls');
   }
 
-  return `# ${encounterSummary} \n\n<hr>\n\n` +
-  _.map(encounter, (num, id) => {
-    const description = monstersByName[id].description;
-    return description;
-  }).join('\n\n<hr>\n\n');
+  // const encounterSummary = _.map(encounter, (num, id) => {
+  //   const monster = monstersByName[id];
+  //   return ` ${monster.name}(${num})`;
+  // });
+
+
+  // if (!save) {
+  //   console.log(Table.print([
+  //     {
+  //       level,
+  //       difficulty,
+  //       monsterCount,
+  //       adjustedXp,
+  //       // monsterXp,
+  //       monsterCr,
+  //       monsters: encounterSummary,
+  //     }
+  //   ]));
+
+  //   if (!only) {
+  //     _.forEach(encounter, (num, id) => {
+  //       console.log(marked(monstersByName[id].description));
+  //     });
+  //   }
+  // }
+
+  return {
+    rerolls,
+    actualXp,
+    quality,
+    monsterCount,
+    monsterXp,
+    totalXp,
+    adjustedXp,
+    encounter,
+  };
+
+  // return `# ${encounterSummary} \n\n<hr>\n\n` +
+  // _.map(encounter, (num, id) => {
+  //   const description = monstersByName[id].description;
+  //   return description;
+  // }).join('\n\n<hr>\n\n');
 }
