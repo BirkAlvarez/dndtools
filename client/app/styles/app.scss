@@ -1,0 +1,84 @@
+// $grid-columns: 24;
+// $grid-column-width: 30px;
+// $grid-gutter-width: 1px;
+
+
+@import "bootstrap";
+// @import 'ember-power-select/themes/bootstrap';
+// @import "ember-power-select";
+// @import "date-picker";
+// @import "main";
+
+.monster-info {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ccc;
+  font-size: 12px;
+
+  h1 {
+    font-size: 16px;
+    margin: 0;
+  }
+
+  h2, h3, h4 {
+    font-size: 14px;
+    margin: 5px 0 0;
+  }
+
+  p {
+    margin: 0;
+    padding-left: 10px;
+  }
+
+  table {
+    margin-left: 10px;
+    border: 1px solid #ccc;
+
+    th,
+    td {
+      padding: 0 10px;
+      border: 1px solid #ccc;
+    }
+  }
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.label-padded {
+  margin-top: 24px;
+}
+
+.no-margin {
+  margin: 0;
+}
+
+.separator {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.no-margin-top {
+  margin-top: 0;
+}
+
+.list-group-item {
+  &.active {
+    a {
+      color: #fff;
+    }
+  }
+}
+
+.label-row {
+  font-weight: bold;
+  font-size: 14px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.ember-cli-g-map {
+  height: 500px;
+  width: 500px;
+}

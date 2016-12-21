@@ -1,0 +1,12 @@
+{{#if encounterData}}
+  <h3>{{encounterData.summary}}</h3>
+
+  {{#each monsters as |monster|}}
+    {{monster-info monster=monster}}
+  {{/each}}
+
+  XP: {{encounterData.actualXp}}
+
+{{else}}
+  [Select Encounter]
+{{/if}}

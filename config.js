@@ -1,4 +1,4 @@
-const ROOT = `./5thSRD-master`;
+const ROOT = __dirname + `/5thSRD-master`;
 const MONSTER_DIR = `${ROOT}/docs/gamemaster_rules/monsters`;
 const SPELLS_DIR = `${ROOT}/docs/spellcasting/spells`;
 const SPELL_LISTS_DIR = `${ROOT}/src/spell_lists`;
