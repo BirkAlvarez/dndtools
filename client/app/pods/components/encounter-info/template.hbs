@@ -1,11 +1,28 @@
 {{#if encounterData}}
-  <h3>{{encounterData.summary}}</h3>
+  <h4>
+    {{encounterData.summary}} /
+    XP: {{encounterData.actualXp}}
+  </h4>
+  <hr>
 
-  {{#each monsters as |monster|}}
-    {{monster-info monster=monster}}
-  {{/each}}
+  <div class="row">
+    <div class="col-sm-9">
+      {{#each monsters as |monster|}}
+        {{monster-info monster=monster}}
+      {{/each}}
+    </div>
 
-  XP: {{encounterData.actualXp}}
+    <div class="col-sm-3">
+      <h5>Initiative</h5>
+      Group: {{groupInitiative}}
+      <br>
+      {{#each initiatives as |initiative|}}
+        {{initiative.roll}} - {{initiative.monsterName}}
+        <br>
+      {{/each}}
+    </div>
+  </div>
+
 
 {{else}}
   [Select Encounter]

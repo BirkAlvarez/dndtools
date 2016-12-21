@@ -1,34 +1,40 @@
 <div class="container">
   <h2>Encounter Generator</h2>
 
-  Average Level:
-  <select onchange={{action (mut level) value="target.value"}}>
-    {{#each levels as |levelChoice|}}
-      <option value={{levelChoice}} selected={{eq level levelChoice}}>{{levelChoice}}</option>
-    {{/each}}
-  </select>
-
-  Number of Players:
-  <select onchange={{action (mut playerCount) value="target.value"}}>
-    {{#each playerCounts as |playerCountChoice|}}
-      <option value={{playerCountChoice}} selected={{eq playerCount playerCountChoice}}>{{playerCountChoice}}</option>
-    {{/each}}
-  </select>
-
-  Environment:
-  <select onchange={{action (mut environment) value="target.value"}}>
-    {{#each environments as |environmentChoice|}}
-      <option value={{environmentChoice}} selected={{eq environment environmentChoice}}>{{environmentChoice}}</option>
-    {{/each}}
-  </select>
-
-  <a class="btn btn-primary" {{action 'generate'}}>Generate</a>
-
-  <hr>
 
 
   <div class="row">
     <div class="col-sm-4">
+      Average Level:
+      <br>
+      <select onchange={{action (mut level) value="target.value"}}>
+        {{#each levels as |levelChoice|}}
+          <option value={{levelChoice}} selected={{eq level levelChoice}}>{{levelChoice}}</option>
+        {{/each}}
+      </select>
+      <br>
+
+      Number of Players:
+      <br>
+      <select onchange={{action (mut playerCount) value="target.value"}}>
+        {{#each playerCounts as |playerCountChoice|}}
+          <option value={{playerCountChoice}} selected={{eq playerCount playerCountChoice}}>{{playerCountChoice}}</option>
+        {{/each}}
+      </select>
+      <br>
+
+      Environment:
+      <br>
+      <select onchange={{action (mut environment) value="target.value"}}>
+        {{#each environments as |environmentChoice|}}
+          <option value={{environmentChoice}} selected={{eq environment environmentChoice}}>{{environmentChoice}}</option>
+        {{/each}}
+      </select>
+      <br>
+
+      <button class="btn btn-primary" {{action 'generate'}}>Generate</button>
+      <hr>
+
       <div class="encounter-table">
         {{#each levelTable as |encounter|}}
           <a {{action 'selectEncounter' encounter.data}}>

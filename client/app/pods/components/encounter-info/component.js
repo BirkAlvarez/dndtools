@@ -14,7 +14,22 @@ export default Ember.Component.extend({
     const monsters = _.keys(encounter).sort().map((id) => {
       return monstersByName[id];
     });
+    const initiatives = [];
+    _.forEach(encounter, (num, id) => {
+      const monster = monstersByName[id];
+      const monsterName = monster.name;
+      const dex = Math.floor(((monster.attrs.stats.dex || 10) - 10) / 2);
+
+      for (let i = 0; i < num; i++) {
+        initiatives.push({
+          monsterName,
+          roll: _.random(1, 20) + dex
+        });
+      }
+    });
 
     this.set('monsters', monsters);
+    this.set('initiatives', _.sortBy(initiatives, 'roll').reverse());
+    this.set('groupInitiative', Math.round(_(initiatives).map('roll').sum() / initiatives.length));
   },
 });
