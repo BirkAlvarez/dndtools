@@ -1,10 +1,10 @@
-<div class="container">
+<div class="container-fluid">
   <h2>Encounter Generator</h2>
 
 
 
   <div class="row">
-    <div class="col-sm-4">
+    <div class="col-sm-4 col-lg-2">
       Average Level:
       <br>
       <select onchange={{action (mut level) value="target.value"}}>
@@ -46,7 +46,7 @@
       </div>
     </div>
 
-    <div class="col-sm-8">
+    <div class="col-sm-8 col-lg-10">
       {{encounter-info encounterData=activeEncounter}}
     </div>
   </div>

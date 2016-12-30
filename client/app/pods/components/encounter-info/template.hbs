@@ -3,6 +3,10 @@
     {{encounterData.summary}} /
     XP: {{encounterData.actualXp}}
   </h4>
+  {{#each-in encounterData.encounter as |monster|}}
+    <a href="https://www.google.com/search?q={{monster}}&tbm=isch">{{monster}}</a>
+    <br>
+  {{/each-in}}
   <hr>
 
   <div class="row">
