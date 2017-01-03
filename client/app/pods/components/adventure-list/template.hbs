@@ -1,0 +1,10 @@
+{{yield}}
+
+{{#each adventures as |adventure|}}
+  {{adventure.name}}
+  {{input value=adventure.name}}
+  <button class="btn btn-success" {{action 'saveAdventure' adventure}}>
+    Save
+  </button>
+  <br>
+{{/each}}

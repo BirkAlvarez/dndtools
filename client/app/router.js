@@ -7,7 +7,8 @@ const Router = Ember.Router.extend({
 });
 
 Router.map(function() {
-  this.route('app', function() {
+  this.route('app', {path: '/'}, function() {
+    this.route('adventures', {path: '/'});
     this.route('encounter');
   });
 });

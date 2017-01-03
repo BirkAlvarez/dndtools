@@ -1,22 +1,16 @@
 /* jshint node: true */
-const monsters = require('../../lib/monsters');
 
 module.exports = function(environment) {
   var ENV = {
     modulePrefix: 'client',
-    podModulePrefix: 'client/pods',
     environment: environment,
-    rootURL: '/',
-    locationType: 'auto',
+    podModulePrefix: 'client/pods',
+    baseURL: '/',
+    locationType: 'hash',
     EmberENV: {
-      monsters,
       FEATURES: {
         // Here you can enable experimental features on an ember canary build
         // e.g. 'with-controller': true
-      },
-      EXTEND_PROTOTYPES: {
-        // Prevent Ember Data from overriding Date.parse.
-        Date: false
       }
     },
 
@@ -36,6 +30,7 @@ module.exports = function(environment) {
 
   if (environment === 'test') {
     // Testem prefers this...
+    ENV.baseURL = '/';
     ENV.locationType = 'none';
 
     // keep test console output quieter
@@ -46,7 +41,6 @@ module.exports = function(environment) {
   }
 
   if (environment === 'production') {
-
   }
 
   return ENV;
